@@ -3,15 +3,15 @@
   <div > 
     <input type="number" placeholder="поиск по номеру квартиры" v-model="houseId" class="search">
   </div> 
-    <list :data="people" :id="houseId"/>
+    <!-- <list :data="people" :id="houseId"/> -->
     <!-- <myform />  -->
   </div>
 </template>
 
 <script>
 
-import people from './assets/people'
-import list from './components/List'
+// import people from './assets/people'
+// import list from './components/List'
 
 // import myform from './components/Myform'
 
@@ -19,12 +19,12 @@ import list from './components/List'
 export default {
   name: 'App',
   components: {
-    list
+    // list
     // myform
   },
   data() {
     return {
-      people,
+      // people,
       houseId:""
     }
   },
