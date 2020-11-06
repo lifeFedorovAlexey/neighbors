@@ -1,7 +1,10 @@
 <template>
   <div id="app">
   <div > 
+    <label>
+      Найти соседа?
     <input type="number" placeholder="поиск по номеру квартиры" v-model="houseId" class="search">
+    </label>
   </div> 
     <!-- <list :data="people" :id="houseId"/> -->
     <!-- <myform />  -->
