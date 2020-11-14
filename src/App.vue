@@ -1,20 +1,17 @@
 <template>
   <div id="app">
   <div > 
-    <label>
-      Найти соседа?
     <input type="number" placeholder="поиск по номеру квартиры" v-model="houseId" class="search">
-    </label>
   </div> 
-    <!-- <list :data="people" :id="houseId"/> -->
+    <list :data="people" :id="houseId"/>
     <!-- <myform />  -->
   </div>
 </template>
 
 <script>
 
-// import people from './assets/people'
-// import list from './components/List'
+import people from './assets/people'
+import list from './components/List'
 
 // import myform from './components/Myform'
 
@@ -22,12 +19,12 @@
 export default {
   name: 'App',
   components: {
-    // list
+    list
     // myform
   },
   data() {
     return {
-      // people,
+      people,
       houseId:""
     }
   },
