@@ -1,34 +1,22 @@
 <template>
   <div id="app">
-  <div > 
-    <input type="number" placeholder="поиск по номеру квартиры" v-model="houseId" class="search">
-  </div> 
-    <list :data="people" :id="houseId"/>
-    <!-- <myform />  -->
+    <div id="nav">
+      <router-link to="/neighbors/">Главная</router-link> |
+      <router-link to="/neighbors/list">Список соседей</router-link>
+    </div>
+    <router-view />
   </div>
 </template>
-
 <script>
-
-import people from './assets/people'
-import list from './components/List'
-
-// import myform from './components/Myform'
-
-
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    list
     // myform
   },
   data() {
-    return {
-      people,
-      houseId:""
-    }
+    return {};
   },
-}
+};
 </script>
 
 <style>
@@ -37,21 +25,19 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-
-  margin-top: 60px;
+  color: #2c3e50;
 }
 
-ol{
-  margin: 0;
-  padding: 0;
+#nav {
+  padding: 30px;
 }
-.search{
-  box-shadow: inset 0 0 5px 1px #45494d6e;
-    border-radius: 100px 100px 100px 100px;
-    border-color: #ffffff00;
-    outline: none !important;
-    margin: 10px;
-    padding: 10px;
-    width: 50%;
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
 }
 </style>

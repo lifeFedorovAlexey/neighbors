@@ -118,6 +118,15 @@ async function startAPI() {
     res.status(200).send("авторизован");
   });
 
+  app.post("/api/isAuth", auth, (req, res) => {
+    res.status(200).send("авторизован");
+  });
+
+  app.post("/api/test", auth, function(req, res) {
+    console.log(req.body);
+    res.send("Got a POST request");
+  });
+
   app.listen(PORT, () => {
     console.log("API Запущен, порт: " + PORT);
   });

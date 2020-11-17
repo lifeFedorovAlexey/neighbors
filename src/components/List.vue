@@ -23,7 +23,7 @@
 <script>
 // import houses from '../assets/houses'
 export default {
-  name: "list",
+  name: "mylist",
   props: {
     data: Array,
     id: String,
