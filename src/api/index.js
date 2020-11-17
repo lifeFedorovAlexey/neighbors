@@ -1,7 +1,11 @@
 let axios = require("axios");
 
 module.exports = {
-  getAuth: async () => {
-    return axios.post("/api/test", { text: "text" });
+  getUserInfo: async () => {
+    return axios.get("/api/userinfo", { text: "text" });
+  },
+
+  updateNeihbors: async (neihbors) => {
+    return axios.post("/api/updateNeihbors", { neihbors });
   },
 };

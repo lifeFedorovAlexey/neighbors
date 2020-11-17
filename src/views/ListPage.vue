@@ -1,15 +1,12 @@
 <template>
   <div class="listPage">
-    <!-- <div>
-      <input
-        type="number"
-        placeholder="поиск по номеру квартиры"
-        v-model="houseId"
-        class="search"
-      />
-    </div> -->
-    <button @click="check">sdfsdfr</button>
-    <!-- <list :data="people" :id="houseId" /> -->
+    <input type="text" v-model="listData" /><button @click="parse">
+      подгрузить строкой
+    </button>
+    <button @click="upload">
+      записать
+    </button>
+    {{ error }}
   </div>
 </template>
 <script>
@@ -24,12 +21,27 @@ export default {
   },
   data() {
     return {
-      houseId: "",
+      listData: "",
+      parseData: [],
+      error: "",
     };
   },
   methods: {
-    check: async function() {
-      console.log(await api.getAuth());
+    parse: async function() {
+      try {
+        this.parseData = JSON.parse(this.listData);
+        this.error = "распаршено";
+      } catch (err) {
+        this.error = "не корректный формат";
+      }
+    },
+    upload: async function() {
+      try {
+        await api.updateNeihbors(this.parseData);
+        this.error = "загружено";
+      } catch (err) {
+        this.error = "ошибка при записи в базу";
+      }
     },
   },
 };

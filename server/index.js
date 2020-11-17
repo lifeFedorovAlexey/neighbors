@@ -1,20 +1,22 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
 const app = express();
 const bodyParser = require("body-parser");
-let passport = require("./config-pasport");
 
+const passport = require("./config-pasport");
+const session = require("express-session");
+const FileStore = require("session-file-store")(session);
+
+const db = require("./db");
 const PORT = process.env.API_SERVER_PORT;
 const maxAge = Number(process.env.MAX_AGE_SESSION);
-const session = require("express-session");
 
-const FileStore = require("session-file-store")(session);
+const Neighbor = require("./models/neighbor");
 
 (async function start() {
   console.log(currentTime() + " - API загружается");
   try {
-    await connectDB();
+    await db.connect();
     await startAPI();
     console.log(currentTime() + " - API запущено");
   } catch (err) {
@@ -27,7 +29,7 @@ async function startAPI() {
   app.use(bodyParser.json({ extended: true }));
   app.use(
     session({
-      secret: "hghtyNN23h",
+      secret: process.env.VK_SESSION_SEKRET,
       store: new FileStore(),
       cookie: {
         path: "/",
@@ -118,34 +120,32 @@ async function startAPI() {
     res.status(200).send("авторизован");
   });
 
-  app.post("/api/isAuth", auth, (req, res) => {
+  app.post("/api/updateNeihbors", auth, (req, res) => {
+    req.body.neihbors.map(async (neihbor) => {
+      await Neighbor.updateOne(
+        { id: neihbor.id },
+        { $set: neihbor },
+        { upsert: true }
+      );
+    });
+    //
     res.status(200).send("авторизован");
+    
   });
 
-  app.post("/api/test", auth, function(req, res) {
-    console.log(req.body);
-    res.send("Got a POST request");
+  app.get("/api/userinfo", auth, function(req, res) {
+    res.send({
+      id: req.user.id,
+      familyName: req.user.familyName,
+      givenName: req.user.givenName,
+      photo: req.user.photo,
+      profileUrl: req.user.profileUrl,
+    });
   });
 
   app.listen(PORT, () => {
     console.log("API Запущен, порт: " + PORT);
   });
-}
-
-function connectDB() {
-  const db = process.env.DB;
-  mongoose.connect(
-    process.env.DB_HOST + db,
-    {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-    },
-    function(err) {
-      if (err) throw err;
-      console.log(currentTime() + " - Подключен к базе " + db);
-    }
-  );
 }
 
 function currentTime() {
