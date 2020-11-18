@@ -1,20 +1,138 @@
 <template>
   <div class="listPage">
-    <table class="t_neighbor">
-      <tr>
-        <th v-for="t_title in t_titles" :key="t_title.id">{{ t_title }}</th>
-      </tr>
-      <tr v-for="neighbor in neighbors" :key="neighbor.id">
-        <td>{{ neighbor.id }}</td>
-        <td>{{ neighbor.first_name }}</td>
-        <td>{{ neighbor.last_name }}</td>
-        <td>{{ neighbor.housing }}</td>
-        <td>{{ neighbor.front_door }}</td>
-        <td>{{ neighbor.stage }}</td>
-        <td>{{ neighbor.apartment_number }}</td>
-        <td>{{ neighbor.owner }}</td>
-      </tr>
-    </table>
+    <b-col lg="6" class="my-1">
+      <b-form-group class="mb-0">
+        <b-input-group size="sm">
+          <b-form-input
+            v-model="filter"
+            type="search"
+            id="filterInput"
+            placeholder="Искать"
+          ></b-form-input>
+          <b-input-group-append>
+            <b-button :disabled="!filter" @click="filter = ''"
+              >Очистить</b-button
+            >
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-col>
+
+    <b-table
+      :items="neighbors"
+      :fields="fields"
+      :filter="filter"
+      :filter-included-fields="filterOn"
+      striped
+      responsive="sm"
+    >
+      <template #cell(show_details)="row">
+        <b-button size="sm" @click="row.toggleDetails" class="mr-2">
+          {{ row.detailsShowing ? "Скрыть" : "Показать" }}
+        </b-button>
+      </template>
+
+      <template #row-details="row">
+        <b-card>
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>Имя:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.first_name"
+                :placeholder="row.item.first_name"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>Имя:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.last_name"
+                :placeholder="row.item.last_name"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>№ корпуса:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.housing"
+                :placeholder="row.item.housing"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>№ подъезда:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.front_door"
+                :placeholder="row.item.front_door"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>№ этажа:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.stage"
+                :placeholder="row.item.stage"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>№ квартиры:</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.apartment_number"
+                :placeholder="row.item.apartment_number"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>Собственник</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.owner"
+                :placeholder="row.item.owner"
+              ></b-form-input
+            ></b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>ID вконтакте</b></b-col>
+            <b-col
+              ><b-form-input
+                v-model="row.item.vkid"
+                :placeholder="row.item.vkid"
+              ></b-form-input>
+            </b-col>
+          </b-row>
+
+          <b-row class="mb-2">
+            <b-col sm="3" class="text-sm-right"><b>Ссылка вконтакте</b></b-col>
+            <b-col
+              ><a
+                :href="(row.item.id = 'https://vk.com/' + row.item.vkid)"
+                target="_blank"
+                class="text-right"
+                >Проверить ссылку</a
+              >
+            </b-col>
+          </b-row>
+
+          <b-button size="sm mr-2" @click="row.toggleDetails">Скрыть</b-button>
+          <b-button size="sm mr-2" @click="updateNeighbor(row.item)"
+            >Обновить</b-button
+          >
+        </b-card>
+      </template>
+    </b-table>
   </div>
 </template>
 <script>
@@ -29,103 +147,44 @@ export default {
   },
   data() {
     return {
-      // listData: "",
-      // parseData: [],
-      // error: "",
-      t_titles: [
-        "Ссылка",
-        "Имя",
-        "Фамилия",
-        "Корпус",
-        "Подьезд",
-        "Этаж",
-        "Квартира",
-        "Собственник",
+      search: "",
+      fields: [
+        { key: "apartment_number", label: "№" },
+        { key: "fio", label: "Имя" },
+        { key: "show_details", label: "Действия" },
       ],
       neighbors: [],
+      filter: null,
+      filterOn: ["apartment_number", "fio"],
     };
   },
   async created() {
-    let arr = await api.getneighbors();
-    let id = 0;
-    arr.data.map((item) => {
-      let neighbor = {};
-      this.$set(neighbor, "id", item.id);
-      this.$set(neighbor, "first_name", item.first_name);
-      this.$set(neighbor, "last_name", item.last_name);
-      this.$set(neighbor, "housing", item.housing);
-      this.$set(neighbor, "front_door", item.front_door);
-      this.$set(neighbor, "stage", item.stage);
-      this.$set(neighbor, "apartment_number", item.apartment_number);
-      this.$set(neighbor, "owner", item.owner);
+    let arr = await api.getNeighbors();
+    arr.data.map((neighbor) => {
+      neighbor.isActive = false;
+      neighbor.fio = neighbor.first_name + " " + neighbor.last_name;
+      neighbor.vkid = neighbor.id.slice(15);
       this.neighbors.push(neighbor);
     });
   },
 
   methods: {
-    // parse: async function() {
-    //   try {
-    //     this.parseData = JSON.parse(this.listData);
-    //     this.error = "распаршено";
-    //   } catch (err) {
-    //     this.error = "не корректный формат";
-    //   }
-    // },
+    updateNeighbor: async function(neighbor) {
+      try {
+        await api.updateNeighbor(neighbor);
+      } catch (err) {
+        console.log(err);
+      }
+    },
     upload: async function() {
       try {
         await api.updateNeihbors(this.parseData);
-        this.error = "загружено";
       } catch (err) {
-        this.error = "ошибка при записи в базу";
+        console.log(err);
       }
     },
   },
+  computed: {},
 };
 </script>
-<style scoped>
-.t_neighbor {
-  width: 100%;
-}
-
-table {
-  font-size: 14px;
-  border-spacing: 0;
-  text-align: center;
-}
-th {
-  background: #3f8ae0;
-  color: white;
-  text-shadow: 0 1px 1px #2d2020;
-  padding: 10px 20px;
-}
-th,
-td {
-  border-style: solid;
-  border-width: 0 1px 1px 0;
-  border-color: white;
-}
-th:first-child,
-td:first-child {
-  text-align: left;
-}
-th:first-child {
-  border-top-left-radius: 10px;
-}
-th:last-child {
-  border-top-right-radius: 10px;
-  border-right: none;
-}
-td {
-  padding: 10px 20px;
-  background: #cfdff1;
-}
-tr:last-child td:first-child {
-  border-radius: 0 0 0 10px;
-}
-tr:last-child td:last-child {
-  border-radius: 0 0 10px 0;
-}
-tr td:last-child {
-  border-right: none;
-}
-</style>
+<style></style>

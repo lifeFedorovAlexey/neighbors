@@ -119,20 +119,52 @@ async function startAPI() {
   app.get("/api/isAuth", auth, (req, res) => {
     res.status(200).send("авторизован");
   });
-  app.get("/api/neihbors", auth, async (req, res) => {
+  app.get("/api/neighbors", auth, async (req, res) => {
     res.send(await Neighbor.find());
   });
 
-  app.post("/api/updateNeihbors", auth, (req, res) => {
+  app.post("/api/updateNeighbors", auth, (req, res) => {
     req.body.neihbors.map(async (neihbor) => {
       await Neighbor.updateOne(
-        { id: neihbor.id },
+        { _id: neihbor._id },
         { $set: neihbor },
         { upsert: true }
       );
     });
-    //
-    res.status(200).send("авторизован");
+    res.status(200);
+  });
+
+  app.post("/api/updateNeighbor", auth, async (req, res) => {
+    let neighbor = {};
+    neighbor._id = req.body.neighbor._id ? req.body.neighbor._id : "";
+    neighbor.id = req.body.neighbor.id ? req.body.neighbor.id : "";
+    neighbor.first_name = req.body.neighbor.first_name
+      ? req.body.neighbor.first_name
+      : "";
+    neighbor.last_name = req.body.neighbor.last_name
+      ? req.body.neighbor.last_name
+      : "";
+    neighbor.front_door = req.body.neighbor.front_door
+      ? req.body.neighbor.front_door
+      : "";
+    neighbor.housing = req.body.neighbor.housing
+      ? req.body.neighbor.housing
+      : "";
+    neighbor.stage = req.body.neighbor.stage ? req.body.neighbor.stage : "";
+    neighbor.apartment_number = req.body.neighbor.apartment_number
+      ? req.body.neighbor.apartment_number
+      : "";
+    neighbor.owner = req.body.neighbor.owner ? req.body.neighbor.owner : false;
+
+    res
+      .status(200)
+      .send(
+        await Neighbor.updateOne(
+          { _id: neighbor._id },
+          { $set: neighbor },
+          { upsert: true }
+        )
+      );
   });
 
   app.get("/api/userinfo", auth, function(req, res) {
