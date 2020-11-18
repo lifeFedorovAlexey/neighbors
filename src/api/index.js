@@ -8,4 +8,8 @@ module.exports = {
   updateNeihbors: async (neihbors) => {
     return axios.post("/api/updateNeihbors", { neihbors });
   },
+
+  getneighbors: async () => {
+    return axios.get("/api/neihbors");
+  },
 };

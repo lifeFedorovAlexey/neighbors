@@ -29,7 +29,7 @@ async function startAPI() {
   app.use(bodyParser.json({ extended: true }));
   app.use(
     session({
-      secret: process.env.VK_SESSION_SEKRET,
+      secret: process.env.VK_SESSION_SECRET,
       store: new FileStore(),
       cookie: {
         path: "/",
@@ -119,6 +119,9 @@ async function startAPI() {
   app.get("/api/isAuth", auth, (req, res) => {
     res.status(200).send("авторизован");
   });
+  app.get("/api/neihbors", auth, async (req, res) => {
+    res.send(await Neighbor.find());
+  });
 
   app.post("/api/updateNeihbors", auth, (req, res) => {
     req.body.neihbors.map(async (neihbor) => {
@@ -130,7 +133,6 @@ async function startAPI() {
     });
     //
     res.status(200).send("авторизован");
-    
   });
 
   app.get("/api/userinfo", auth, function(req, res) {
